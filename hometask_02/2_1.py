@@ -1,12 +1,13 @@
 __author__ = 'Oleksandr Shapran'
-
+    
 '''
 Напишите метакласс, который, выполняет следующие функции:
 - заменять все приватные атрибуты данных (не методы!) на публичные
 - добавлять в наследующий класс статический метод, код которого,
 приведен ниже [1]
 - добавлять в наследующий класс метод, код которого приведен ниже
-[2]
+[2]
+
 '''
 
 # [1]
@@ -24,7 +25,7 @@ class PublicMeta(type):
         newattrs = dict()
         #private fields make public
         for k, v in attrs.items():
-            if k.startswith('_'+name+'__') and not hasattr(v, "__call__"):
+            if k.startswith('_'+name+'__') and not callable(v): 
                 k = k.replace('_'+name+'__', '')
                 newattrs[k] = v
             else:

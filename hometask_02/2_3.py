@@ -39,7 +39,7 @@ class AOpen:
                       'w': os.O_WRONLY|os.O_CREAT,
                       'a': os.O_APPEND|os.O_CREAT,
                       'rw': os.O_RDWR|os.O_CREAT,
-                      'ra' : os.O_RDONLY|os.O_APPEND|os.O_CREAT,
+                      'ra' : os.O_RDWR|os.O_APPEND|os.O_CREAT,
                       'wa': os.O_APPEND|os.O_CREAT}
         
         #create decriptor for the file
@@ -86,16 +86,18 @@ class AOpen:
 
      
 if __name__ == "__main__":
-    with AOpen( 'F:\\temp\\fooClass.txt', 'rw' ) as file:
+    with AOpen( 'F:\\temp\\fooClass.txt', 'ra' ) as file:
 
         file.write('Method Write 1 \nMethod Write 2 \n')
         file.writeLine('Method write line')
         file.seek(0)
         print(file.read())
-        x = file.readLine()
-        while x:
-            print(x, end='')
-            x = file.readLine() 
+        data = '' 
+        while True:
+            data += file.readLine()
+            if not data:
+                break;
+        print(data)  
 
 
     f =  AOpen( 'F:\\temp\\foo.txt', 'rw' ) 

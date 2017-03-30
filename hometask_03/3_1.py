@@ -51,17 +51,6 @@ def writer(params):
 @writer('bpx')
 #@writer('')
 def html_printer(s: str) -> str:
-    '''
-    s = s
-    REPLACEMENTS = [
-        (">", "&gt;"),
-        ("<", "&lt;"),
-        ("'", "&#x27;")
-        ]
-    for entity, replacement in REPLACEMENTS:
-        s = s.replace(entity, replacement)
-    return s
-    '''
     return html.escape(s)
     
 

@@ -12,8 +12,6 @@ __author__ = 'Oleksandr Shapran'
 
 '''
 
-import html
-
 def html_p(s: str) -> str:
     new_s = '<p>{}<p>'.format(s)
     return new_s
@@ -48,10 +46,9 @@ def writer(params):
     return decorator
             
 
-@writer('bpx')
-#@writer('')
+#@writer('bpx')
+@writer('')
 def html_printer(s: str) -> str:
-    '''
     s = s
     REPLACEMENTS = [
         (">", "&gt;"),
@@ -61,10 +58,7 @@ def html_printer(s: str) -> str:
     for entity, replacement in REPLACEMENTS:
         s = s.replace(entity, replacement)
     return s
-    '''
-    return html.escape(s)
     
 
 if __name__ == "__main__":
-    print(html_printer("I'll give you +++ cash for this -> stuff."))
-
+    print(html_printer("I'll give you +++ cash for this -> stuff."))

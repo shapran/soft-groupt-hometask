@@ -33,20 +33,19 @@ def csv_load(file: object) -> str:
     csv_reader = csv.reader(file, delimiter=';')
     result = ''
     for row in csv_reader:
-        result += ' '.join(row)
+        result += ' '.join(row)            
         result += '\n'
     return result.rstrip('\n')
 
 def csv_save(s: str, file: object) -> None:
-    rowsList = s.split('\n')
+    rowsList = s.split('\n')    
     csv_writer = csv.writer(file)
     for row in rowsList:
        row = row.replace(' ', ';')
        csv_writer.writerow([row]) 
 
 def json_load(file: object) -> str:
-    #file_content = json.loads(file.read())
-    file_content = json.load(file)
+    file_content = json.loads(file.read())
     result = '\n'.join(file_content['rows'])
     return result
     
@@ -74,27 +73,28 @@ class AbstractConverter(ABC):
 
 class ConverterFabric(AbsConverterFabric):
     def create_converter(self, _from: str, _to: str) -> object:
+        if _from == 'csv' and _to == 'json':
+            return  ConverterCSVtoJSON()
+        elif _from == 'json' and _to == 'csv':
+           return  ConverterJSONtoCSV()
+        else:
+            raise Exception('Unknown converter. Implemented csv -> json and json -> csv')
+    
 
-        class DynamicClass(AbstractConverter):
-            def load(self, file):
-                if _from == 'csv':
-                    return csv_load(file)
-                elif _from == 'json':
-                    return json_load(file)
-                else:
-                    raise Exception('Unknown format FROM converter')
+class ConverterCSVtoJSON(AbstractConverter):
+    def load(self, file: object) -> str:
+        return csv_load(file)
 
-            def save(self, s, file):
-                if _to == 'csv':
-                    return csv_save(s, file)
-                elif _to == 'json':
-                    return json_save(s, file)
-                else:
-                    raise Exception('Unknown format FROM converter')
+    def save(self, s: str, file: object) -> object:
+        json_save(s, file)
 
-        return DynamicClass()
+class ConverterJSONtoCSV(AbstractConverter):
+    def load(self, file: object) -> str:
+        return json_load(file)
 
-
+    def save(self, s: str, file: object) -> object:
+        csv_save(s, file)
+    
 
 if __name__ == "__main__":
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     with open('json.txt', 'r') as file:
         result = converter2.load(file)
         print(result)
-    with open('csv.txt', 'w', newline='') as file:
+    with open('csv_out.txt', 'w', newline='') as file:
         converter2.save(result, file)
 
 

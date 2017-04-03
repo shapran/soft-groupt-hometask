@@ -26,6 +26,7 @@ __author__ = 'Oleksandr Shapran'
 
 '''
 from abc import ABC, abstractmethod
+from collections import OrderedDict 
 import csv
 import json
 
@@ -46,7 +47,7 @@ def csv_save(s: str, file: object) -> None:
 
 def json_load(file: object) -> str:
     #file_content = json.loads(file.read())
-    file_content = json.load(file)
+    file_content = json.load(file, object_pairs_hook=OrderedDict)
     result = '\n'.join(file_content['rows'])
     return result
     
@@ -93,6 +94,8 @@ class ConverterFabric(AbsConverterFabric):
                     raise Exception('Unknown format FROM converter')
 
         return DynamicClass()
+
+    #type meta
 
 
 

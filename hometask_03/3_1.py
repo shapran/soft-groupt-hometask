@@ -34,22 +34,24 @@ def writer(params):
     def decorator(func):
         def wrapper(str):
             res = str
-            #call appropriate func if decorator parameters == p, b or i
+
+            func_dict = {
+                'p' : html_p,
+                'b' : html_b,
+                'i' : html_i
+                }
+            
             for x in params:
-                if x == 'p':
-                    res = html_p(res)
-                elif x == 'b':
-                    res = html_b(res)
-                elif x == 'i':
-                    res = html_i(res)
+                if x in func_dict:
+                    res = func_dict[x](res)
                  
             return func(res)
         return wrapper
     return decorator
             
 
-@writer('bpx')
-#@writer('')
+#@writer('bpx')
+@writer('')
 def html_printer(s: str) -> str:
     return html.escape(s)
     

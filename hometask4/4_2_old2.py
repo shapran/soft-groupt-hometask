@@ -37,7 +37,6 @@ import logging
 
 import threading
 from queue import Queue
-from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.INFO,
                      format='%(levelname)s:%(name)s:%(message)s',)
@@ -69,20 +68,32 @@ class Scrapper:
         
     def start(self):
         self.__prepare()
-        
-        result_task = []
 
-        #create thread pool with limit -2 threads
-        with ThreadPoolExecutor(2) as TPool:
-            queries_list = []
-            for i in range(self.page_from, self.page_to):
-                queries_list.append(self.get_link(i))
-            #results of each thread in list
-            results = TPool.map(self.get_crawl_result_for_each_thread, queries_list)
-            for r in results:
-                result_task += r
-                
-        return result_task
+        #queue for threads
+        self.q = Queue()
+        #semaphore for limitation
+        self.semaphore = threading.BoundedSemaphore(value = self.limit)
+        threads = []
+        result = []
+
+        #create a thread for each page
+        for i in range(self.page_from, self.page_to):
+            name = 'thread_{}'.format(i)
+            link = self.get_link(i)
+            t = threading.Thread(target=self.get_crawl_result_for_each_thread,
+                                 name=name, args=(link,))
+            self.semaphore.acquire()
+            t.start()
+            threads.append(t)
+
+        for thread in threads:
+            thread.join()
+
+        while not self.q.empty():
+            result += self.q.get()
+            self.q.task_done()
+
+        return result
     
 
     def notify(self, url):
@@ -92,7 +103,9 @@ class Scrapper:
     def get_crawl_result_for_each_thread(self, link):
         result = self.crawl(link)
         self.notify(link)
-        return result       
+        self.semaphore.release()
+        self.q.put(result)
+        
 
     def get_link(self, page):
         link = 'https://www.olx.ua/chernovtsy/q-{0}/?page={1}'.format(self.query, page)

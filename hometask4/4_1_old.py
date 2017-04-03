@@ -6,6 +6,7 @@
 
 '''
 
+from queue import Queue
 import threading
 from threading import RLock, Lock, Semaphore
 import time
@@ -16,12 +17,13 @@ def worker(file: object, *args):
     file using synchronization primitive
     :param file: file-object
     :return: '''
+    
+    q.put(threading.currentThread().name)
  
     with lock:
         file.write(threading.currentThread().name + ': ' + 'started.\n')        
         time.sleep(random.random() * 5)
         file.write(threading.currentThread().name + ': ' + 'done.\n')
-        print(threading.currentThread().name + ': ' + 'done.\n')
 
     return None
  
@@ -30,6 +32,8 @@ def worker(file: object, *args):
 if __name__ == '__main__':
     file = open('test.txt', 'a')
  
+
+    q = Queue()
     threads = []
     lock = RLock()
 
@@ -42,6 +46,10 @@ if __name__ == '__main__':
     for thread in threads:
         thread.join()        
 
-    file.close()
+    while not q.empty():
+        q.get()
+        q.task_done()
+    else:
+        file.close()
 
 

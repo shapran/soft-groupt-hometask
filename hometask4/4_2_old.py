@@ -102,10 +102,9 @@ class Scrapper:
 
     def get_crawl_result_for_each_thread(self, link):
         result = self.crawl(link)
-        self.notify(link)
         self.semaphore.release()
         self.q.put(result)
-        
+        self.notify(link)
 
     def get_link(self, page):
         link = 'https://www.olx.ua/chernovtsy/q-{0}/?page={1}'.format(self.query, page)

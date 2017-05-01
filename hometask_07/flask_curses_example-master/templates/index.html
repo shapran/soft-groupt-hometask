@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <script type="text/javascript">
+
+  $(document).ready(function(){
+
+    /*  function sendMessage() {
+          var txt = $('#text_search').val();
+          $.post("/", {text: txt}, function(data) {
+          console.log(data)
+          document.write(data);
+          });
+
+      };
+
+      // send message from text search field
+      $('#submit').click(function() {
+        console.log('click')
+        sendMessage();
+      });
+  }) */
+  </script>
+  <form action="results" method="post" >
+    <input type="text" id="text_search" name="text" value="">
+    <input type="submit" id="submit" name="submit" value="Find">
+  </form>
+  <ul class="messages">
+  <table>
+    <tr>
+      <th>Author</th><th>Title</th><th>Price</th><th>Details</th>
+    </tr>  
+  {% for topic in topics %}
+    <tr>
+      <td>{{ topic.author }}</td>
+      <td>{{ topic.title }}</td>
+      <td>
+          {% if topic.price  %}
+            {{ topic.price }}
+          {% endif %}
+
+      </td>
+      <td><a href="/post/{{ topic._id }}">&gt;&gt;</a></td>
+    </tr>
+    
+  {% endfor %}
+  </table>
+  </ul>
+    <p id="sup"></p>
+    
+{% endblock %}

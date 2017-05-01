@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <div class="post-info">
+  {% if post %}
+
+
+      <dl>Название: </dl><dd>{{ post.title }}</dd>
+      <dl>Ссылка: </dl><dd><a href="{{ post.url }}">{{ post.url }}</a></dd> 
+      <dl>Автор: </dl><dd>{{ post.author }}</dd>       
+      {% if post.price  %}
+
+        <dl>Цена: </dl><dd>{{ post.price }}</dd> 
+        <dl>Валюта: </dl><dd>{{ post.currency }}</dd> 
+      {% endif %}
+      <dl>Содержание: </dl><dd>{{ post.text }}</dd> 
+      
+
+  {% else %}
+      <li><p>No results found</p>
+  {% endif %}
+  </div>
+  <a href="{{ url_for('home_page') }}">Back</a>
+{% endblock %}

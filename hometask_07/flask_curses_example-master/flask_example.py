@@ -48,7 +48,7 @@ def login_required(f):
 def get_user_id(username):
     """Convenience method to look up the id for a username."""
     rv = User.query.filter_by(username=username).first()
-    return rv[0] if rv else None
+    return rv if rv else None
 
 # Example view with regex routing
 @app.route('/id_<regex("\d+"):id>/')
@@ -60,10 +60,6 @@ def detail(id):
     topic = Topics.query.filter_by(_id = id).first_or_404()
     return jsonify({'id': id, 'title': topic.title, 'author': topic.author.nickname, 'url': topic.url})
 
-
-
-
-
 @app.route('/', methods=['GET'])
 @login_required
 def home_page():
@@ -72,24 +68,6 @@ def home_page():
         #topics = Topics.query.all()
         topics = Overclockers.query.all()
         return render_template('index.html', topics=topics)
-
- 
-'''
-@app.route('/', methods=['POST'])
-@login_required
-def home_page_post():
-    """Render results"""
-    if request.method == 'POST':
-        topics = []
-         
-        search_query = request.form['text']
-        if search_query:
-            like_str = '%' + search_query + '%'
-            topics = Overclockers.query.filter(
-                (Overclockers.text.ilike(like_str)) | (Overclockers.title.ilike(like_str)))
-            
-    return render_template('results.html', topics=topics )
-'''
 
 @app.route('/results', methods=['POST'])
 @login_required

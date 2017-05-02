@@ -5,7 +5,7 @@
 Simple application displays data from SQLite db
 and allows to save it in file.
 
-author: Olexandr Shapran 
+author: Olexandr Shapran
 """
 
 import sys
@@ -15,42 +15,59 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, \
      QAction, QTableWidget,QTableWidgetItem,QVBoxLayout, QPushButton, \
      QFileDialog, QMessageBox
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot 
+from PyQt5.QtCore import pyqtSlot
+from PyQt5 import QtCore
 from SQLite_downloader import SQLite_downloader
 from multiprocessing.pool import ThreadPool
 
-SQLite_LOCATION = r'F:\Python\ChernLearning\Lesson7_flask_win32\flask_curses_example-master\flask_curses_example-master\db\db.db'
- 
+SQLite_LOCATION = './flask_curses_example-master/db/db.db'
+
+class DataLoader(QtCore.QThread):
+
+    send_data = QtCore.pyqtSignal(object)
+
+    def __init__(self):
+        QtCore.QThread.__init__(self)
+
+
+    def run(self):
+        sqlite_connector = SQLite_downloader(SQLite_LOCATION)
+        data = sqlite_connector.start()
+        self.send_data.emit(data)
+
+    def __del__(self):
+        self.wait()
+
 class App(QWidget):
- 
+
     def __init__(self):
         super().__init__()
         self.title = 'Simple PyQt5 app'
-        
+
         self.left = 50
         self.top = 50
         self.width = 800
         self.height = 600
         self.initUI()
-        
- 
+
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
- 
+
         self.createTable()
         self.createBtns()
- 
+
         # Add box layout, add table to box layout and add box layout to widget
         self.layout = QVBoxLayout()
         #Add elements to layout
         self.layout.addWidget(self.btn1)
         self.layout.addWidget(self.btn2)
         self.layout.addWidget(self.tableWidget)
-        
-        self.setLayout(self.layout)  
+
+        self.setLayout(self.layout)
         # Show widget
-        self.show() 
+        self.show()
 
 
     def createBtns(self):
@@ -71,11 +88,11 @@ class App(QWidget):
     def createTable(self):
         '''Create table'''
         self.tableWidget = QTableWidget()
-        self.tableWidget.move(0, 0) 
- 
+        self.tableWidget.move(0, 0)
+
         # table selection change
         self.tableWidget.doubleClicked.connect(self.on_click)
- 
+
     @pyqtSlot()
     def on_click(self):
         print("\n")
@@ -84,41 +101,40 @@ class App(QWidget):
 
     def fillTable(self):
         ''' fill table '''
+        self.get_thread = DataLoader()
+        self.get_thread.send_data.connect(self.fill_slot)
+        self.get_thread.start()
 
-        #create connection
-        sqlite_connector = SQLite_downloader(SQLite_LOCATION)
-        pool = ThreadPool(processes=1)
-        async_result = pool.apply_async(sqlite_connector.start )
-        #get data downloaded from sqlite
-        self.data = async_result.get()
+    def fill_slot(self, data):
+        self.data = data
         width = len(self.data[0])
-        height = len(self.data) 
-         
-        #set row and column
-        self.tableWidget.setRowCount( height )
+        height = len(self.data)
+
+        # set row and column
+        self.tableWidget.setRowCount(height)
         self.tableWidget.setColumnCount(width)
-        #fill cells
-        for h in range(height ):
+        # fill cells
+        for h in range(height):
             for w in range(width):
                 cell = str(self.data[h][w]) if self.data[h][w] else ''
-                self.tableWidget.setItem(h, w, QTableWidgetItem( cell ))
-        self.btn2.setEnabled(True)        
+                self.tableWidget.setItem(h, w, QTableWidgetItem(cell))
+        self.btn2.setEnabled(True)
 
     def saveFileDialog(self):
         ''' Save file to located place '''
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, ext = QFileDialog.getSaveFileName(self,"File saver","","Text Files (*.txt)", options=options)
-        if fileName:            
-            ext = '.txt' if ext == "Text Files (*.txt)" else ''  
+        if fileName:
+            ext = '.txt' if ext == "Text Files (*.txt)" else ''
             self.saveData(fileName + ext)
             print( fileName + ext )
             self.displayMsgBox("File saved!")
-            
+
     def saveData(self, path):
         with open(path, 'w', encoding='utf-8') as file:
             json.dump(self.data, file, ensure_ascii=False)
-            
+
     def displayMsgBox(self, title):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -129,7 +145,7 @@ class App(QWidget):
 
 
 if __name__ == '__main__':
- 
+
     app = QApplication(sys.argv)
     ex = App()
     sys.exit(app.exec_())

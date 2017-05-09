@@ -1,8 +1,13 @@
 <!doctype html>
 <title>{% block title %}Welcome{% endblock %} | Scraper</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+-->
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style_local.css') }}">
+<link href="{{ url_for('static', filename='bootstrap-3.3.7-dist/css/bootstrap.min.css') }}" rel="stylesheet">
+
 <script src="{{ url_for('static', filename='js/jquery-1.12.0.min.js') }}"></script>
-<div class="page">
+
+<div class="page text-center">
   <h1>Flask test app</h1>
   <div class="navigation">
   {% if g.user %}
@@ -16,11 +21,13 @@
   </div>
   {% with flashes = get_flashed_messages() %}
     {% if flashes %}
-      <ul class="flashes">
+      <br/>
+      <div class="flashes bg-success">
       {% for message in flashes %}
-        <li>{{ message }}
+        <span>{{ message }} </span>
       {% endfor %}
-      </ul>
+      </div>
+      <br/>
     {% endif %}
   {% endwith %}
   <div class="body">

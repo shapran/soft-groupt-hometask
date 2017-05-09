@@ -24,6 +24,14 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+    #@property
+    def serialize(self):
+       """Return object data in easily serializeable format"""
+       return {
+           'name'         : self.username,
+           'email': self.email
+       }
+
 class Coins(db.Model):
     __tablename__ = 'coins' 
     name  = db.Column(db.String(30))
@@ -53,9 +61,9 @@ class Rating(db.Model):
     d7 = db.Column(db.Float)
     pub_date = db.Column(db.DateTime)
 
-    def __init__(self, rating, name,  market_cap, price, supply, volume, h1, h24, d7, pub_date=None):
+    def __init__(self, rating, name_coin,  market_cap, price, supply, volume, h1, h24, d7, _date=None):
         self.rating = rating
-        self.name_coin  = name
+        self.name_coin  = name_coin
         self.market_cap  = market_cap
         self.price = price
         self.supply = supply
@@ -63,10 +71,30 @@ class Rating(db.Model):
         self.h1 = h1
         self.h24 = h24
         self.d7 = d7
-        if pub_date is None:
-            pub_date = datetime.utcnow()
+        if _date is None:
+            self.pub_date = datetime.utcnow()
+        else:
+            self.pub_date = _date
 
     def __repr__(self):
-        return '<%r, %r, %r, %r, %r>' % (self.rating, self.name_coin, self.symbol_coin, self.price,  self.pub_date)
+        return '%r, %r, %r, %r' % (self.rating, self.symbol_coin, self.price,  self.pub_date.strftime('%Y-%m-%d %H:%M'))
+          
+
+    
+    def serialize(self):
+       """Return object data in easily serializeable format"""
+       return {
+            'rating': self.rating,
+            'symbol_coin': self.symbol_coin,
+            'name': self.name_coin.name,
+            'market_cap': self.market_cap,
+            'price': self.price,
+            'supply': self.supply,
+            'volume': self.volume,
+            'h1': self.h1,
+            'h24': self.h24,
+            'd7': self.d7,
+            'modified_at': self.pub_date.strftime('%Y-%m-%d %H:%M')
+       }
  
 

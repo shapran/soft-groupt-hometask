@@ -21,39 +21,68 @@
       });
   }) */
   </script>
-  <form action="results" method="post" >
-    <input type="text" id="text_search" name="text" value="">
-    <input type="submit" id="submit" name="submit" value="Find">
-  </form>
+  <br/>
+  <div class="row">
+    <form action="results" method="post" class="form-inline  col-lg-6 col-lg-offset-1">
+      <input type="text" id="text_search" name="text" value="" class="form-control">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <input type="submit" id="submit" name="submit" class="btn btn-default" value="Find">
+    </form>
+  </div>
+  <br/>
   <ul class="messages">
-  <table>
+  <table class="row  table table-striped table-hover">
     <tr>
-
-		<th>#</th><th>Name</th><th>Symbol</th>
-		<th>Market Cap</th><th>Price</th>
-		<th>Circulating Supply</th>
-		<th>Volume (24h)</th><th>% 1h</th>
-		<th>% 24h</th><th>% 7d</th>
+  		<th class="col-lg-1 col-lg-offset-1">#</th>
+      <th class="col-lg-1">Name</th>
+      <th class="col-lg-1">Symbol</th>
+  		<th class="col-lg-1">Market Cap</th>
+      <th class="col-lg-1">Price</th>
+  		<th class="col-lg-1">Circulating Supply</th>
+  		<th class="col-lg-1">Volume (24h)</th>
+      <th class="col-lg-1">% 1h</th>
+  		<th class="col-lg-1">% 24h</th>
+      <th class="col-lg-1">% 7d</th>
     </tr>  
-  {% for topic in topics %}
+  {% for rate in ratings %}
     <tr>
-      <td>{{ topic.rating }}</td>
-      <td>{{ topic.name }}</td>
-      <td>{{ topic.symbol }}</td>
-      <td>${{ topic.market_cap }}</td>
-      <td>{{ topic.price }}</td>
-      <td>${{ topic.supply }}</td>
-      <td>${{ topic.volume }}</td>
-      <td>{{ topic.h1 }}%</td>
-      <td>{{ topic.h24 }}%</td>
-      <td>{{ topic.d7 }}%</td>  
-      <!-- <td>
-          {% if topic.price  %}
-            {{ topic.price }}
-          {% endif %}
-
-      </td> 
-      <td><a href="/post/{{ topic._id }}">&gt;&gt;</a></td>-->
+      <td class="col-lg-1  col-lg-offset-1">{{ rate.rating }}</td>
+      <td class="col-lg-1 BLUE">
+        <a href="/coin/{{ rate.symbol_coin }}">
+          {{ rate.name_coin.name }}
+        </a>
+        
+      </td>
+      <td class="col-lg-1">{{ rate.symbol_coin }}</td>
+      <td class="col-lg-1">${{ rate.market_cap|round|int }}</td>
+      <td class="col-lg-1 BLUE">{{ rate.price }}</td>
+      <td class="col-lg-1 BLUE">${{ rate.supply|round|int }}</td>
+      <td class="col-lg-1 BLUE">${{ rate.volume|round|int }}</td>
+      <td class="col-lg-1 GREEN">
+        {% set h1 = rate.h1*100 %}
+        {% if h1 >= 0 %}
+            {{ h1|round(2, 'common') }}%
+        {% else %}
+            <span class='RED'>{{ h1|round(2, 'common') }}%</span>
+        {% endif %}
+      </td>
+      <td class="col-lg-1 GREEN">
+        {% set h24 = rate.h24*100 %}
+        {% if h24 >= 0 %}
+            {{ h24|round(2, 'common') }}%
+        {% else %}
+            <span class='RED'>{{ h24|round(2, 'common') }}%</span>
+        {% endif %}
+      </td>
+      <td class="col-lg-1 GREEN">
+        {% set d7 = rate.d7*100 %}
+        {% if  d7 >= 0 %}
+            {{  d7|round(2, 'common') }}%
+        {% else %}
+            <span class='RED'>{{ d7|round(2, 'common') }}%</span>
+        {% endif %}
+      </td>  
+      
     </tr>
     
   {% endfor %}

@@ -3,19 +3,25 @@ from models import User, Coins, Rating, db
 import sys
 sys.path.insert(0, '../')
 from flask_example import app
+from sqlalchemy import func 
 
 
 if __name__ == '__main__':
     with app.app_context() as context:
         db.init_app(context.app)
 
-        coins =[Coins('Coin1', 'C1'),
+        '''
+        coins =[Coins('Coin1', 'C8'),
              Coins('Coin2', 'C2')]
  
-        #check if coin exist, otherwise add it
-        for c in coins:
-            if Coins.query.filter_by(symbol = c.symbol).count() == 0:
-                db.session.add(c)
+#check if coin exist, otherwise add it
+        for x in range(len(coins)):
+            result = Coins.query.filter_by(symbol = coins[x].symbol) 
+            if result.count() == 0:
+                db.session.add(coins[x])
+            else:
+                coins[x] = result[0] 
+                
 
         db.session.commit()
         
@@ -35,16 +41,23 @@ if __name__ == '__main__':
          
             
         db.session.commit()
+        '''
 
-        #Queries on related fields example'''
-        print("Rating" + "*"*20)
+        #Queries on related fields example
+        print("coins" + "*"*20)
         coins = Coins.query.all()
-        for c in coins:
-            print(c)
+        #for c in coins:
+           # print(c)
             
         print("Rating" + "*"*20)
-        rating = Rating.query.all()
-        for r in rating:
+        ##rating = Rating.query.all()
+
+        
+        ##max_date = db.session.query(func.max(Rating.pub_date))
+        ratings =  Rating.query.filter_by(symbol_coin = 'BTC')
+        
+        #ratings = Rating.query.filter_by(pub_date = max_date).all()
+        for r in ratings:
              #print('rating and coin name by foreign key: {}'.format(r.name_coin.name))
              print('rating: {}'.format(r))
         

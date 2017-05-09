@@ -19,7 +19,6 @@
         <th class="col-lg-1">% 24h</th>
         <th class="col-lg-1">% 7d</th>
         <th class="col-lg-1">date update</th>
-
       </tr>  
     {% for rate in ratings %}
       <tr>
@@ -55,7 +54,6 @@
         {% endif %}
       </td> 
       <td class="col-lg-1">{{ rate.pub_date.strftime('%Y-%m-%d %H:%M') }}</td>  
-        
       </tr>
       
     {% endfor %}

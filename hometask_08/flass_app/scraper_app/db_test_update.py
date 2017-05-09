@@ -12,7 +12,13 @@ if __name__ == '__main__':
         coins =[Coins('Coin1', 'C1'),
              Coins('Coin2', 'C2')]
  
+        #check if coin exist, otherwise add it
+        for c in coins:
+            if Coins.query.filter_by(symbol = c.symbol).count() == 0:
+                db.session.add(c)
 
+        db.session.commit()
+        
         now =  datetime.utcnow()
         rates = [Rating(1, coins[1], 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, now ),
                  Rating(2, coins[1], 1.2, 2.2, 3.2, 4.2, 5.2, 6.2, 7.2, now ),
@@ -20,10 +26,7 @@ if __name__ == '__main__':
                 Rating(4, coins[0], 1.4, 2.4, 3.4, 4.4, 5.4, 6.4, 7.4, now ) ]
 
         
-        #check if coin exist, otherwise add it
-        for c in coins:
-            if Coins.query.filter_by(symbol = c.symbol).count() == 0:
-                db.session.add(c)
+        
 
         for rate in rates:
             db.session.add(rate)

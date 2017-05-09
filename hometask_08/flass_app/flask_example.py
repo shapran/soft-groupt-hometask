@@ -5,7 +5,9 @@ from werkzeug import check_password_hash, generate_password_hash
 from werkzeug.routing import BaseConverter
 from scraper_app.models import db, User, Coins, Rating, lower 
 
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse, abort
+from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import func 
 import json
 
 
@@ -17,12 +19,15 @@ SECRET_KEY = 'key123'
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.from_envvar('EXAPP_SETTINGS', silent=True)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/db1.db'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///scraper_app/db/test_db.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/db1.db' 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 ##
 api = Api(app)
+
+#setup scrf-token
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 # initialize sqlalchemy with context of current app
 db.init_app(app)
@@ -77,8 +82,9 @@ def detail(id):
 def home_page():
     """Displays topics"""
     if request.method == 'GET':
-        topics = Currencies.query.all()
-        return render_template('index.html', topics=topics)
+        max_date = db.session.query(func.max(Rating.pub_date))        
+        ratings = Rating.query.filter_by(pub_date = max_date).all()
+        return render_template('index.html', ratings=ratings)
 
 
 
@@ -87,22 +93,22 @@ def home_page():
 def results():
     """Render results"""
     if request.method == 'POST':
-        topics = []
+        ratings = []
          
         search_query = request.form['text']
         if search_query:
             like_str = '%' + search_query + '%'
-            topics = Currencies.query.filter(
-                (Currencies.name.ilike(like_str)) | (Currencies.symbol.ilike(like_str)))
+            ratings =  Rating.query.join(Coins).filter(
+                (Coins.name.ilike(like_str)) | (Rating.symbol_coin.ilike(like_str)))
 
-    return render_template('results.html', topics=topics  )
+    return render_template('results.html', ratings=ratings  )
 
-@app.route('/post/<_id>', methods=['GET'])
+@app.route('/coin/<symbol>', methods=['GET'])
 @login_required
-def post(_id):
-    """Displays separated topic"""    
-    post = Overclockers.query.filter_by(_id=_id).first()
-    return render_template('post.html', post=post)
+def coin(symbol):
+    """Displays separated coin tating"""    
+    ratings =  Rating.query.filter_by(symbol_coin = symbol)
+    return render_template('coin_rate.html', ratings=ratings)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -166,13 +172,44 @@ def register():
     return render_template('register.html', error=error)
 
 
-class HelloWorld(Resource):
-    def get(self):
-        topics = Currencies.query.all()
-        return json.dumps(topics)
-        #return {'hello': 'world'}
+#add parser for API arguments
+parser = reqparse.RequestParser()
+parser.add_argument('login')
+parser.add_argument('symbol')
 
-api.add_resource(HelloWorld, '/api/') 
+def login_checker(login):
+    result = User.query.filter_by(username = login).first() 
+    if result:
+        return True
+    else:
+        return False
+
+class API_handler(Resource):
+    
+    def get(self):
+        args = parser.parse_args()
+        login =  args['login']
+        symbol = False
+        if 'symbol' in args:
+            symbol = args['symbol']
+ 
+        if not login_checker(login):            
+            abort(404, message="login {} is not registered. Denied!".format(login))
+
+        
+        #returns latest data
+        if not symbol:
+            max_date = db.session.query(func.max(Rating.pub_date))        
+            ratings = Rating.query.filter_by(pub_date = max_date).all()        
+            return json.dumps( [r.serialize() for r in ratings] )
+        #returns data by coin symbol
+        else:
+            ratings = Rating.query.filter_by(symbol_coin = symbol).all()
+            if not ratings:
+                abort(404, message="Coin {} is not present in database.".format(symbol))
+            return json.dumps( [r.serialize() for r in ratings] )
+         
+api.add_resource(API_handler, '/api/') 
 
 
 

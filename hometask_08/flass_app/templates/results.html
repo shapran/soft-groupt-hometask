@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <ul class="messages">
+
+
+  {% if topics.count() %}
+
+    <table>
+      <tr>
+
+      <th>#</th><th>Name</th><th>Symbol</th>
+      <th>Market Cap</th><th>Price</th>
+      <th>Circulating Supply</th>
+      <th>Volume (24h)</th><th>% 1h</th>
+      <th>% 24h</th><th>% 7d</th>
+      </tr>  
+    {% for topic in topics %}
+      <tr>
+        <td>{{ topic.rating }}</td>
+        <td>{{ topic.name }}</td>
+        <td>{{ topic.symbol }}</td>
+        <td>${{ topic.market_cap }}</td>
+        <td>{{ topic.price }}</td>
+        <td>${{ topic.supply }}</td>
+        <td>${{ topic.volume }}</td>
+        <td>{{ topic.h1 }}%</td>
+        <td>{{ topic.h24 }}%</td>
+        <td>{{ topic.d7 }}%</td>  
+         
+      </tr>
+      
+    {% endfor %}
+    </table>
+
+
+  {% else %}
+      <li><p>No results found</p>
+  {% endif %}
+  </ul>
+  <a href="{{ url_for('home_page') }}">Back</a>
+{% endblock %}

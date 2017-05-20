@@ -1,0 +1,19 @@
+body {
+    background: #e8edf3;
+    background-image: url(img/bg.jpg);
+    font-family: 'Trebuchet MS', sans-serif;
+    font-size: 14px;
+} 
+
+.BLUE {
+    color: blue;
+}
+
+.GREEN {
+    color: green;
+}
+
+.RED {
+    color: red;
+}
+

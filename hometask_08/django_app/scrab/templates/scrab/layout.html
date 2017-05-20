@@ -1,0 +1,45 @@
+﻿<!doctype html>  
+{% load staticfiles %}
+{% load humanize %}
+    <html>
+        <head>
+            <title>
+                {% block title %}Welcome{% endblock %} | Scraper
+                
+            </title>
+            <link rel="stylesheet" type="text/css" href="{% static  'style_local.css' %}">
+            <link href="{% static  'bootstrap-3.3.7-dist/css/bootstrap.min.css'  %}" rel="stylesheet">
+
+            <script src="{% static  'js/jquery-1.12.0.min.js' %}"></script>
+
+ 
+        </head>
+        <body>
+
+        <div class="body">
+             
+
+        {% if user.is_authenticated %}
+            <p class="lead">
+                Hello, {{ user.username }}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="nav-link" href="{% url 'logout' %}"> Logout </a>
+            </p> 
+        {% else %}
+            <p class="lead"> 
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            </p>
+        {% endif %}
+
+
+          {% block content %}{% endblock %}
+        </div>  
+        <div class="footer">
+            Flask application
+        </div>
+
+        
+        </body>
+    </html>

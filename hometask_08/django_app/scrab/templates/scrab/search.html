@@ -1,0 +1,86 @@
+﻿    
+    {% extends 'scrab/layout.html' %}
+
+    {% block content %}
+<div class="body">
+  {% if ratings %}
+
+    <p class="lead"> 
+      <a class="nav-link" href="{% url 'index' %}">Main page</a>
+      <br/><br/>
+    </p>
+
+
+    <div class="_row">
+      <table class="table table-striped table-hover">
+        <tr>
+            <th class="col-lg-1  col-lg-offset-1">#</th>
+          <th class="col-lg-1">Name</th>
+          <th class="col-lg-1">Symbol</th>
+            <th class="col-lg-1">Market Cap</th>
+          <th class="col-lg-1">Price</th>
+            <th class="col-lg-1">Circulating Supply</th>
+            <th class="col-lg-1">Volume (24h)</th>
+          <th class="col-lg-1">% 1h</th>
+            <th class="col-lg-1">% 24h</th>
+          <th class="col-lg-1">% 7d</th>
+          <th class="col-lg-1">Date dowloaded</th>
+        </tr>  
+      {% for rate in ratings %}
+        <tr>
+          <td class="col-lg-1  col-lg-offset-1">{{ rate.rating }}</td>
+          <td class="col-lg-1 BLUE">
+            <a href="/coin/{{ rate.name_coin.symbol }}">
+              {{ rate.name_coin.name }}
+            </a>
+            
+          </td>
+          <td class="col-lg-1">{{ rate.name_coin.symbol }}</td>
+          <td class="col-lg-1">${{ rate.market_cap|floatformat:"0" }}</td>
+          <td class="col-lg-1 BLUE">{{ rate.price }}</td>
+          <td class="col-lg-1 BLUE">${{ rate.supply|floatformat:"0"  }}</td>
+          <td class="col-lg-1 BLUE">${{ rate.volume|floatformat:"0"  }}</td>
+          <td class="col-lg-1 GREEN">
+            {% with h1_=rate.h24 %}    
+              {% if  rate.h1 >= 0 %}
+                  {{  h1_|floatformat:"2" }}%
+              {% else %}
+                  <span class='RED'>{{ h1_|floatformat:"2"}}%</span>
+              {% endif %}
+            {% endwith %}             
+          </td>
+          <td class="col-lg-1 GREEN">
+            {% with h24_=rate.h24 %}    
+              {% if  rate.h24 >= 0 %}
+                  {{  h24_|floatformat:"2" }}%
+              {% else %}
+                  <span class='RED'>{{ h24_|floatformat:"2"}}%</span>
+              {% endif %}
+            {% endwith %}
+          </td>
+          <td class="col-lg-1 GREEN">
+            {% with d7_=rate.d7 %}
+              {% if  rate.d7 >= 0 %}
+                  {{  d7_|floatformat:"2" }}%
+              {% else %}
+                  <span class='RED'>{{ d7_|floatformat:"2"}}%</span>
+              {% endif %}
+            {% endwith %}
+          </td>  
+          <td class="col-lg-1">            
+            {{ rate.pub_date|date:"d.m.Y H:i" }}
+          </td>
+        </tr>
+        
+      {% endfor %}
+      </table>
+    </div>
+
+  {% else %}
+    <div>Sorry, nothing was found.</div>
+    <a class="nav-link" href="{% url 'index' %}">Main page</a>
+  {% endif %}
+  
+
+</div>
+    {% endblock content %}

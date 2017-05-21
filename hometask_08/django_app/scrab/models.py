@@ -1,17 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-class User(models.Model):
-
-    item_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=128) 
-    email = models.TextField()
-    password = models.TextField()
-
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
 
 class Coins(models.Model):
     name  = models.CharField(max_length=128) 

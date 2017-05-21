@@ -20,10 +20,4 @@ urlpatterns = [
     url(r'^register/$', views.register, name='register'),
     url(r'^login/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
-    #url(r'^api1/', include(router.urls)),
-    #url(r'^api1/', include('rest_framework.urls', namespace='rest_framework'))
-    
-    #url(r'^post/(?P<pk>[0-9]+)/$', views.post_detail, name='post_detail'),
-    #url(r'^post/new/$', views.post_new, name='post_new'),
-    #url(r'^post/(?P<pk>[0-9]+)/edit/$', views.post_edit, name='post_edit'),
 ]

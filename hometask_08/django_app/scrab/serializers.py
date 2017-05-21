@@ -22,10 +22,20 @@ class CoinSerializer(serializers.HyperlinkedModelSerializer):
 
 class RatingSerializer(serializers.HyperlinkedModelSerializer):
 
-    name_coin = CoinSerializer()
+    name = serializers.SerializerMethodField('get_symbol_name')
+    symbol = serializers.SerializerMethodField('get_symbol_symbol')
+
+    def get_symbol_name(self, model):
+        return model.name_coin.name
+
+    def get_symbol_symbol(self, model):
+        return model.name_coin.symbol
+
+    # name_coin = CoinSerializer()
+
     class Meta:
         model = Rating
-        fields = ('rating', 'name_coin', 'market_cap', 'price', 'supply', 'volume', 'h1', 'h24', 'd7', 'pub_date')
+        fields = ('rating', 'name', 'symbol', 'market_cap', 'price', 'supply', 'volume', 'h1', 'h24', 'd7', 'pub_date')
 
  
     

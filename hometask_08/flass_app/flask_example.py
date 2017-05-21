@@ -82,8 +82,9 @@ def detail(id):
 def home_page():
     """Displays topics"""
     if request.method == 'GET':
-        max_date = db.session.query(func.max(Rating.pub_date))        
-        ratings = Rating.query.filter_by(pub_date = max_date).all()
+        max_date = db.session.query(func.max(Rating.pub_date))
+        # ratings = Rating.query.filter_by(pub_date = max_date).all()
+        ratings = Rating.query.order_by('pub_date desc').all()
         return render_template('index.html', ratings=ratings)
 
 
@@ -199,7 +200,7 @@ class API_handler(Resource):
         
         #returns latest data
         if not symbol:
-            max_date = db.session.query(func.max(Rating.pub_date))        
+            max_date = db.session.query(func.max(Rating.pub_date)).with_hint(Rating, 'USE INDEX (rating_pd_idx)')
             ratings = Rating.query.filter_by(pub_date = max_date).all()        
             return json.dumps( [r.serialize() for r in ratings] )
         #returns data by coin symbol

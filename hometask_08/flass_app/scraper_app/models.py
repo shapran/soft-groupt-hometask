@@ -4,8 +4,6 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-
-
 def lower(field):
     return func.lower(field)
 
@@ -96,5 +94,3 @@ class Rating(db.Model):
             'd7': self.d7,
             'modified_at': self.pub_date.strftime('%Y-%m-%d %H:%M')
        }
- 
-

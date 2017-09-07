@@ -9,7 +9,7 @@ print(result1)
 print("="*50)
 #load error
 print('load error')
-result3 = get('http://localhost:5000/api/?login=9' ).json() 
+result3 = get('http://localhost:5000/api/?login=1' ).json()
 print(result3)
 print("="*50)
 #load latest data

@@ -25,7 +25,6 @@ urlpatterns = [
 
 from django.conf.urls import include, url
 from django.contrib import admin
-import blog.urls
 from rest_framework import routers
 from scrab import views
 
@@ -35,13 +34,10 @@ router.register(r'coins', views.CoinViewSet)
 router.register(r'rating', views.RatingViewSet)
 router.register(r'groups', views.GroupViewSet)
 
- 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    ##url(r'^b/', include('blog.urls')),
     url(r'', include('scrab.urls')),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(router.urls)),
-    #url(r'^api/api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-    
 ]
+

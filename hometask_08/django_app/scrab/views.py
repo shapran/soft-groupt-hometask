@@ -1,15 +1,17 @@
- 
+
 from django.utils import timezone
-from .models import User, Rating, Coins
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
 from django.db.models import Max
-from .forms import SearchForm, UserForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+
+from .models import Rating, Coins
+from .forms import SearchForm, UserForm
 
  
 from rest_framework import viewsets
@@ -60,26 +62,25 @@ def search(request):
 
 
 def register(request):
-    registered = False
     if request.method == 'POST':
         user_form = UserForm(data=request.POST)
-        #profile_form = UserProfileForm(data=request.POST)
-
-        if user_form.is_valid()  :
-            user = user_form.save()
-            user.set_password(user.password)
-            user.save()
-            registered = True
+        if user_form.is_valid():
+            user_data = user_form.cleaned_data
+            username = user_data['username']
+            email = user_data['email']
+            password = user_data['password']
+            if not (User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists()):
+                User.objects.create_user(username, email, password)
+                user = authenticate(username=username, password=password)
+                login(request, user)
+                return redirect('/login/')
+            else:
+                user_form.add_error(None, 'Looks like a username with that email or password already exists')
+                return render(request, 'scrab/register.html', {'form': user_form})
 
     else:
         user_form = UserForm()
-
-    return render(request,
-                  'scrab/register.html',
-                  {'user_form': user_form,
-                   
-                   'registered': registered
-                  })
+    return render(request, 'scrab/register.html', {'user_form': user_form})
 
 
 @login_required(login_url="/login/")
@@ -148,20 +149,20 @@ class CoinViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = Coins.objects.all()
     serializer_class = CoinSerializer
+
+    queryset = Coins.objects.all()
 
 class RatingViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-
-    latest = Rating.objects.latest('pub_date')
-    queryset = Rating.objects.filter(pub_date = latest.pub_date)
-
-    
-    #queryset = Rating.objects.all().order_by('-pub_date')[:5]
     serializer_class = RatingSerializer
+
+    # latest = Rating.objects.latest('pub_date')
+    # queryset = Rating.objects.filter(pub_date = latest.pub_date).select_related('name_coin')
+    data_set = [symbol.rating_set.all()[0]._db for symbol in Coins.objects.all().prefetch_related('rating_set')]
+    queryset = Rating.objects.filter(_db__in=data_set).select_related('name_coin')
 
 
 

@@ -1,8 +1,8 @@
 from django.contrib import admin
+from django.contrib.auth.models import User
 
 # Register your models here.
-from .models import User, Coins, Rating
+from .models import Coins, Rating
 
-admin.site.register(User)
 admin.site.register(Coins)
 admin.site.register(Rating)
